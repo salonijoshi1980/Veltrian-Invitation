@@ -406,11 +406,9 @@
     <div id="earlyJoinModal" class="modal">
         <div class="modal-content">
             <h3>Join as Early User</h3>
-            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" 
-              action="/thank-you" onsubmit="return checkDuplicate('earlyEmail')">
-
+            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
+                onsubmit="return handleEarlySubmit(event)">
                 <input type="hidden" name="form-name" value="early-access" />
-                <input type="hidden" name="redirect" value="/thank-you" />
                 <input id="earlyEmail" type="email" name="email" placeholder="Enter your email" required />
                 <div class="modal-buttons">
                     <button type="submit">Submit</button>
@@ -424,11 +422,9 @@
     <div id="contribModal" class="modal">
         <div class="modal-content">
             <h3>Become a Contributor</h3>
-           <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" 
-              action="/thank-you" onsubmit="return checkDuplicate('contribEmail')">
-
+            <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
+                onsubmit="return handleContribSubmit(event)">
                 <input type="hidden" name="form-name" value="contrib-access" />
-                <input type="hidden" name="redirect" value="/thank-you" />
                 <input id="contribEmail" type="email" name="email" placeholder="Enter your email" required />
                 <div class="modal-buttons">
                     <button type="submit">Submit</button>
@@ -438,37 +434,40 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script>
         // Modal open/close
-        function openEarlyModal() {
-            document.getElementById('earlyJoinModal').style.display = 'flex';
-        }
+        function openEarlyModal() { document.getElementById('earlyJoinModal').style.display = 'flex'; }
+        function closeEarlyModal() { document.getElementById('earlyJoinModal').style.display = 'none'; }
+        function openContribModal() { document.getElementById('contribModal').style.display = 'flex'; }
+        function closeContribModal() { document.getElementById('contribModal').style.display = 'none'; }
 
-        function closeEarlyModal() {
-            document.getElementById('earlyJoinModal').style.display = 'none';
-        }
-
-        function openContribModal() {
-            document.getElementById('contribModal').style.display = 'flex';
-        }
-
-        function closeContribModal() {
-            document.getElementById('contribModal').style.display = 'none';
-        }
-
-        // Duplicate email check using localStorage
-        function checkDuplicate(inputId) {
-            const emailInput = document.getElementById(inputId).value.trim().toLowerCase();
-            const storageKey = inputId + '-submitted';
-
-            if (localStorage.getItem(storageKey + '-' + emailInput)) {
+        // Duplicate email check + redirect to thank-you page
+        function handleEarlySubmit(event) {
+            const email = document.getElementById('earlyEmail').value.trim().toLowerCase();
+            const storageKey = 'earlyEmail-submitted';
+            if (localStorage.getItem(storageKey + '-' + email)) {
                 alert('Email already registered!');
+                event.preventDefault();
                 return false;
-            } else {
-                localStorage.setItem(storageKey + '-' + emailInput, 'true');
-                return true;
             }
+            localStorage.setItem(storageKey + '-' + email, 'true');
+            // Redirect after slight delay to ensure Netlify submission
+            setTimeout(() => { window.location.href = '/thank-you.html'; }, 50);
+            return true;
+        }
+
+        function handleContribSubmit(event) {
+            const email = document.getElementById('contribEmail').value.trim().toLowerCase();
+            const storageKey = 'contribEmail-submitted';
+            if (localStorage.getItem(storageKey + '-' + email)) {
+                alert('Email already registered!');
+                event.preventDefault();
+                return false;
+            }
+            localStorage.setItem(storageKey + '-' + email, 'true');
+            // Redirect after slight delay to ensure Netlify submission
+            setTimeout(() => { window.location.href = '/thank-you.html'; }, 50);
+            return true;
         }
 
         // Fetch Netlify form submission counts for live count
@@ -487,14 +486,13 @@
                 if (contribForm) {
                     document.getElementById("contribCount").innerText = `Total Contributors Interested: ${contribForm.submissions}`;
                 }
-
             } catch (err) {
                 console.warn("Could not fetch Netlify form submissions:", err);
             }
         }
-
         document.addEventListener("DOMContentLoaded", updateGlobalCounts);
     </script>
+
 </body>
 
 </html>
