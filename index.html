@@ -406,8 +406,9 @@
     <div id="earlyJoinModal" class="modal">
         <div class="modal-content">
             <h3>Join as Early User</h3>
-            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
-                onsubmit="return checkDuplicate('earlyEmail')">
+            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" 
+              action="/thank-you" onsubmit="return checkDuplicate('earlyEmail')">
+
                 <input type="hidden" name="form-name" value="early-access" />
                 <input type="hidden" name="redirect" value="/thank-you" />
                 <input id="earlyEmail" type="email" name="email" placeholder="Enter your email" required />
@@ -423,8 +424,9 @@
     <div id="contribModal" class="modal">
         <div class="modal-content">
             <h3>Become a Contributor</h3>
-            <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
-                onsubmit="return checkDuplicate('contribEmail')">
+           <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" 
+              action="/thank-you" onsubmit="return checkDuplicate('contribEmail')">
+
                 <input type="hidden" name="form-name" value="contrib-access" />
                 <input type="hidden" name="redirect" value="/thank-you" />
                 <input id="contribEmail" type="email" name="email" placeholder="Enter your email" required />
