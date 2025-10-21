@@ -1,15 +1,15 @@
-// No need for node-fetch; Node 18+ has native fetch
-exports.handler = async function(event) {
-  // Only allow GET requests
-  if (event.httpMethod && event.httpMethod !== "GET") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" }),
-    };
-  }
+const fetch = require("node-fetch");
 
+exports.handler = async function() {
   const siteId = process.env.YOUR_NETLIFY_SITE_ID;
   const token = process.env.NETLIFY_API_TOKEN;
+
+  if (!siteId || !token) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Environment variables missing!" }),
+    };
+  }
 
   try {
     const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
@@ -17,6 +17,10 @@ exports.handler = async function(event) {
     });
 
     const forms = await formsRes.json();
+
+    if (!Array.isArray(forms)) {
+      return { statusCode: 500, body: JSON.stringify({ error: "Forms not an array" }) };
+    }
 
     const earlyForm = forms.find(f => f.name === "early-access");
     const contribForm = forms.find(f => f.name === "contrib-access");
