@@ -9,24 +9,40 @@ exports.handler = async function () {
   }
 
   try {
-    const res = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
+    // 1. Get all forms
+    const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+    const formsData = await formsRes.json();
+    const formsArray = Array.isArray(formsData) ? formsData : formsData.forms;
 
-    const data = await res.json();
-
-    const formsArray = Array.isArray(data) ? data : data.forms; // ensure it's an array
     if (!formsArray) throw new Error("No forms returned");
 
+    // Find your forms
     const earlyForm = formsArray.find(f => f.name === "early-access");
     const contribForm = formsArray.find(f => f.name === "contrib-access");
 
-    const earlyCount = earlyForm?.submissions?.length || 0;
-    const contribCount = contribForm?.submissions?.length || 0;
+    // 2. Fetch submissions separately for full email list
+    async function getAllEmails(form) {
+      if (!form) return [];
+      const subsRes = await fetch(`https://api.netlify.com/api/v1/forms/${form.id}/submissions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const subsData = await subsRes.json();
+      return subsData.map(s => s.data.email);
+    }
+
+    const earlyEmails = await getAllEmails(earlyForm);
+    const contribEmails = await getAllEmails(contribForm);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ early: earlyCount, contrib: contribCount }),
+      body: JSON.stringify({
+        early: earlyEmails.length,
+        contrib: contribEmails.length,
+        earlyEmails,
+        contribEmails
+      }),
     };
   } catch (err) {
     return { statusCode: 500, body: JSON.stringify({ error: err.message }) };

@@ -406,14 +406,13 @@
     <div id="earlyJoinModal" class="modal">
         <div class="modal-content">
             <h3>Join as Early User</h3>
-            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
-                onsubmit="return handleEarlySubmit(event)">
-                <input type="hidden" name="form-name" value="early-access" />
-                <input id="earlyEmail" type="email" name="email" placeholder="Enter your email" required />
-                <div class="modal-buttons">
-                    <button type="submit">Submit</button>
-                    <button type="button" class="close-btn" onclick="closeEarlyModal()">Close</button>
-                </div>
+            <form name="early-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+              <input type="hidden" name="form-name" value="early-access" />
+              <input id="earlyEmail" type="email" name="email" placeholder="Enter your email" required />
+              <div class="modal-buttons">
+                <button type="submit">Submit</button>
+                <button type="button" class="close-btn" onclick="closeEarlyModal()">Close</button>
+              </div>
             </form>
         </div>
     </div>
@@ -422,14 +421,13 @@
     <div id="contribModal" class="modal">
         <div class="modal-content">
             <h3>Become a Contributor</h3>
-            <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field"
-                onsubmit="return handleContribSubmit(event)">
-                <input type="hidden" name="form-name" value="contrib-access" />
-                <input id="contribEmail" type="email" name="email" placeholder="Enter your email" required />
-                <div class="modal-buttons">
-                    <button type="submit">Submit</button>
-                    <button type="button" class="close-btn" onclick="closeContribModal()">Close</button>
-                </div>
+            <form name="contrib-access" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+              <input type="hidden" name="form-name" value="contrib-access" />
+              <input id="contribEmail" type="email" name="email" placeholder="Enter your email" required />
+              <div class="modal-buttons">
+                <button type="submit">Submit</button>
+                <button type="button" class="close-btn" onclick="closeContribModal()">Close</button>
+              </div>
             </form>
         </div>
     </div>
@@ -473,11 +471,15 @@
           try {
             const res = await fetch('/.netlify/functions/getCounts');
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-
             const data = await res.json();
 
             document.getElementById("earlyCount").innerText = `Total Early Joiners: ${data.early}`;
             document.getElementById("contribCount").innerText = `Total Contributors Interested: ${data.contrib}`;
+
+            // Optional: log emails to console
+            console.log("Early Emails:", data.earlyEmails);
+            console.log("Contributor Emails:", data.contribEmails);
+
           } catch (err) {
             console.warn("Could not fetch global counts:", err);
           }
