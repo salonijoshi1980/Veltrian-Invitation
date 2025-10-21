@@ -468,14 +468,17 @@
             return true;
         }
 
-        // Fetch counts from your serverless function
+        // Fetch counts from your Netlify function
         async function updateGlobalCounts() {
             try {
                 const res = await fetch('/.netlify/functions/getCounts'); // call your function
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
                 const data = await res.json();
 
-                document.getElementById("earlyCount").innerText = `Total Early Joiners: ${data.earlyCount}`;
-                document.getElementById("contribCount").innerText = `Total Contributors Interested: ${data.contribCount}`;
+                // Use the keys returned by the function
+                document.getElementById("earlyCount").innerText = `Total Early Joiners: ${data.early}`;
+                document.getElementById("contribCount").innerText = `Total Contributors Interested: ${data.contrib}`;
             } catch (err) {
                 console.warn("Could not fetch global counts:", err);
             }
@@ -486,6 +489,7 @@
             // Optional: refresh every 30s for live updates
             setInterval(updateGlobalCounts, 30000);
         });
+
     </script>
 
 </body>
