@@ -451,27 +451,41 @@
     function checkDuplicate(inputId) {
       const emailInput = document.getElementById(inputId).value.trim().toLowerCase();
       const storageKey = inputId + '-submitted';
-      if (localStorage.getItem(storageKey) === emailInput) {
+
+      if (localStorage.getItem(storageKey + '-' + emailInput)) {
         alert('Email already registered!');
-        return false; // prevent submission
+        return false;
       } else {
-        localStorage.setItem(storageKey, emailInput);
-        return true; 
+        localStorage.setItem(storageKey + '-' + emailInput, 'true');
+        return true;
       }
     }
 
-    // Netlify Form Submission Counter
-    document.addEventListener("DOMContentLoaded", () => {
-      fetch("https://api.netlify.com/api/v1/forms")
-        .then(res => res.json())
-        .then(forms => {
-          const earlyForm = forms.find(f => f.name === "early-access");
-          const contribForm = forms.find(f => f.name === "contrib-access");
-          if (earlyForm) document.getElementById("earlyCount").innerText = `Total Early Joiners: ${earlyForm.submissions}`;
-          if (contribForm) document.getElementById("contribCount").innerText = `Total Contributors Interested: ${contribForm.submissions}`;
-        })
-        .catch(err => console.warn("Could not fetch Netlify form submissions:", err));
-    });
+    // Fetch Netlify form submission counts for global live count
+    async function updateGlobalCounts() {
+      try {
+        const siteId = 'YOUR_NETLIFY_SITE_ID'; // replace with your Netlify Site ID
+        const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`);
+        const forms = await formsRes.json();
+
+        const earlyForm = forms.find(f => f.name === "early-access");
+        const contribForm = forms.find(f => f.name === "contrib-access");
+
+        if (earlyForm) {
+          document.getElementById("earlyCount").innerText =
+            `Total Early Joiners: ${earlyForm.submissions}`;
+        }
+        if (contribForm) {
+          document.getElementById("contribCount").innerText =
+            `Total Contributors Interested: ${contribForm.submissions}`;
+        }
+
+      } catch (err) {
+        console.warn("Could not fetch Netlify form submissions:", err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", updateGlobalCounts);
   </script>
 </body>
 
