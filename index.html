@@ -490,6 +490,28 @@
           setInterval(updateGlobalCounts, 30000); // refresh every 30s
         });
 
+        // Prevent duplicate submissions for Early Access
+        document.querySelector('form[name="early-access"]').addEventListener('submit', (e) => {
+          const email = e.target.querySelector('input[name="email"]').value.trim();
+          if (localStorage.getItem('earlyEmailSubmitted') === email) {
+            alert("You’ve already joined early access!");
+            e.preventDefault();
+            return;
+          }
+          localStorage.setItem('earlyEmailSubmitted', email);
+        });
+
+        // Prevent duplicate submissions for Contributor Access
+        document.querySelector('form[name="contrib-access"]').addEventListener('submit', (e) => {
+          const email = e.target.querySelector('input[name="email"]').value.trim();
+          if (localStorage.getItem('contribEmailSubmitted') === email) {
+            alert("You’ve already shown interest as a contributor!");
+            e.preventDefault();
+            return;
+          }
+          localStorage.setItem('contribEmailSubmitted', email);
+        });
+
     </script>
 
 </body>
