@@ -451,7 +451,6 @@
                 return false;
             }
             localStorage.setItem(storageKey + '-' + email, 'true');
-            // Redirect after slight delay to ensure Netlify submission
             setTimeout(() => { window.location.href = '/thank-you.html'; }, 50);
             return true;
         }
@@ -465,32 +464,28 @@
                 return false;
             }
             localStorage.setItem(storageKey + '-' + email, 'true');
-            // Redirect after slight delay to ensure Netlify submission
             setTimeout(() => { window.location.href = '/thank-you.html'; }, 50);
             return true;
         }
 
-        // Fetch Netlify form submission counts for live count
+        // Fetch counts from your serverless function
         async function updateGlobalCounts() {
             try {
-                const siteId = 'YOUR_NETLIFY_SITE_ID'; // replace with your Netlify Site ID
-                const formsRes = await fetch(`https://api.netlify.com/api/v1/sites/${siteId}/forms`);
-                const forms = await formsRes.json();
+                const res = await fetch('/.netlify/functions/getCounts'); // call your function
+                const data = await res.json();
 
-                const earlyForm = forms.find(f => f.name === "early-access");
-                const contribForm = forms.find(f => f.name === "contrib-access");
-
-                if (earlyForm) {
-                    document.getElementById("earlyCount").innerText = `Total Early Joiners: ${earlyForm.submissions}`;
-                }
-                if (contribForm) {
-                    document.getElementById("contribCount").innerText = `Total Contributors Interested: ${contribForm.submissions}`;
-                }
+                document.getElementById("earlyCount").innerText = `Total Early Joiners: ${data.earlyCount}`;
+                document.getElementById("contribCount").innerText = `Total Contributors Interested: ${data.contribCount}`;
             } catch (err) {
-                console.warn("Could not fetch Netlify form submissions:", err);
+                console.warn("Could not fetch global counts:", err);
             }
         }
-        document.addEventListener("DOMContentLoaded", updateGlobalCounts);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateGlobalCounts();
+            // Optional: refresh every 30s for live updates
+            setInterval(updateGlobalCounts, 30000);
+        });
     </script>
 
 </body>
